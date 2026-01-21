@@ -139,7 +139,7 @@ export class GameOver extends Phaser.Scene {
     });
 
     menuHitArea.on('pointerup', () => {
-      this.scene.start('MainMenu');
+      this.scene.start('MainMenu', { refreshScores: this.isNewRecord });
     });
   }
 

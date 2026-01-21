@@ -5,6 +5,8 @@ import { Preloader } from './scenes/Preloader';
 import { AuthScene } from './scenes/AuthScene';
 import { MainMenu } from './scenes/MainMenu';
 import { ProfileScene } from './scenes/ProfileScene';
+import { HighScoresScene } from './scenes/HighScoresScene';
+import { HowToPlayScene } from './scenes/HowToPlayScene';
 import { Game } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
 
@@ -25,7 +27,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false,
     },
   },
-  scene: [Boot, Preloader, AuthScene, MainMenu, ProfileScene, Game, GameOver],
+  scene: [Boot, Preloader, AuthScene, MainMenu, ProfileScene, HighScoresScene, HowToPlayScene, Game, GameOver],
 };
 
 const game = new Phaser.Game(config);
