@@ -10,6 +10,8 @@ export class Keypad extends Phaser.GameObjects.Container {
   private sumDisplay: Phaser.GameObjects.Text;
   private sumBackground: Phaser.GameObjects.Graphics;
   private currentSum: number = 0;
+  private selectionCount: number = 0;
+  private readonly MAX_SELECTIONS = 4;
   private onValueSelected: (value: number) => void;
 
   constructor(scene: Phaser.Scene, x: number, y: number, config: KeypadConfig) {
@@ -194,13 +196,21 @@ export class Keypad extends Phaser.GameObjects.Container {
   }
 
   private addToSum(value: number): void {
+    // Check if max selections reached
+    if (this.selectionCount >= this.MAX_SELECTIONS) {
+      this.flashMaxReached();
+      return;
+    }
+
     this.currentSum += value;
+    this.selectionCount++;
     this.updateSumDisplay();
     this.onValueSelected(value);
   }
 
   public resetSum(): void {
     this.currentSum = 0;
+    this.selectionCount = 0;
     this.updateSumDisplay();
   }
 
@@ -209,7 +219,36 @@ export class Keypad extends Phaser.GameObjects.Container {
   }
 
   private updateSumDisplay(): void {
-    this.sumDisplay.setText(`Sum: ${this.currentSum}`);
+    this.sumDisplay.setText(`Sum: ${this.currentSum} (${this.selectionCount}/${this.MAX_SELECTIONS})`);
+  }
+
+  private flashMaxReached(): void {
+    // Flash orange to indicate max reached
+    this.sumDisplay.setColor('#ffaa00');
+    this.sumBackground.clear();
+    this.sumBackground.fillStyle(0x443322, 1);
+    this.sumBackground.fillRoundedRect(
+      -this.scene.cameras.main.width / 2 + 20,
+      -130,
+      this.scene.cameras.main.width - 40,
+      45,
+      10
+    );
+
+    this.scene.cameras.main.shake(50, 0.005);
+
+    this.scene.time.delayedCall(200, () => {
+      this.sumDisplay.setColor('#00ff88');
+      this.sumBackground.clear();
+      this.sumBackground.fillStyle(0x222233, 1);
+      this.sumBackground.fillRoundedRect(
+        -this.scene.cameras.main.width / 2 + 20,
+        -130,
+        this.scene.cameras.main.width - 40,
+        45,
+        10
+      );
+    });
   }
 
   public flashError(): void {
