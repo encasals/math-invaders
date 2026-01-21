@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 
 export class Enemy extends Phaser.GameObjects.Container {
   public targetValue: number;
-  public body!: Phaser.Physics.Arcade.Body;
+  declare public body: Phaser.Physics.Arcade.Body;
   private background: Phaser.GameObjects.Graphics;
   private valueText: Phaser.GameObjects.Text;
   private speed: number;
