@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Cache Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .button { margin: 5px; padding: 10px; background: #007cba; color: white; border: none; cursor: pointer; }
+        .button:hover { background: #005a87; }
+        .cache-info { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Math Invaders PWA Cache Debug</h1>
+    
+    <div>
+        <button class="button" onclick="clearAllCaches()">Clear All Caches</button>
+        <button class="button" onclick="unregisterServiceWorker()">Unregister Service Worker</button>
+        <button class="button" onclick="forceReload()">Force Reload</button>
+        <button class="button" onclick="showCacheInfo()">Show Cache Info</button>
+        <button class="button" onclick="forceUpdate()">Force Update All Users</button>
+    </div>
+
+    <div id="cache-info"></div>
+
+    <script>
+        async function clearAllCaches() {
+            try {
+                const cacheNames = await caches.keys();
+                await Promise.all(cacheNames.map(name => caches.delete(name)));
+                document.getElementById('cache-info').innerHTML = '<div class="cache-info">All caches cleared!</div>';
+                console.log('All caches cleared');
+            } catch (error) {
+                console.error('Error clearing caches:', error);
+                document.getElementById('cache-info').innerHTML = `<div class="cache-info">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function unregisterServiceWorker() {
+            try {
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(registrations.map(reg => reg.unregister()));
+                    document.getElementById('cache-info').innerHTML = '<div class="cache-info">Service worker unregistered!</div>';
+                    console.log('Service worker unregistered');
+                }
+            } catch (error) {
+                console.error('Error unregistering service worker:', error);
+                document.getElementById('cache-info').innerHTML = `<div class="cache-info">Error: ${error.message}</div>`;
+            }
+        }
+
+        function forceReload() {
+            // Clear all caches and reload
+            clearAllCaches().then(() => {
+                location.reload(true);
+            });
+        }
+
+        async function showCacheInfo() {
+            try {
+                const cacheNames = await caches.keys();
+                let info = `<div class="cache-info"><strong>Cache Names:</strong><br>`;
+                
+                for (const cacheName of cacheNames) {
+                    const cache = await caches.open(cacheName);
+                    const requests = await cache.keys();
+                    info += `${cacheName}: ${requests.length} items<br>`;
+                    
+                    requests.forEach(req => {
+                        info += `&nbsp;&nbsp;- ${req.url}<br>`;
+                    });
+                }
+                
+                info += `</div>`;
+                document.getElementById('cache-info').innerHTML = info;
+            } catch (error) {
+                console.error('Error getting cache info:', error);
+                document.getElementById('cache-info').innerHTML = `<div class="cache-info">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function forceUpdate() {
+            try {
+                // This simulates what you'd do when deploying a new version
+                const response = await fetch('/sw.js');
+                const swContent = await response.text();
+                
+                // Show current version info
+                const versionMatch = swContent.match(/const CACHE_VERSION = '([^']+)'/);
+                const currentVersion = versionMatch ? versionMatch[1] : 'unknown';
+                
+                document.getElementById('cache-info').innerHTML = `
+                    <div class="cache-info">
+                        <strong>Current Cache Version:</strong> ${currentVersion}<br>
+                        <strong>To force update all users:</strong><br>
+                        1. Run: <code>npm run force-update</code><br>
+                        2. Deploy to Firebase: <code>firebase deploy</code><br>
+                        <br>
+                        <strong>Or use automated deploy:</strong><br>
+                        Run: <code>npm run deploy</code>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('cache-info').innerHTML = `<div class="cache-info">Error: ${error.message}</div>`;
+            }
+        }
+
+        // Show initial cache info
+        showCacheInfo();
+    </script>
+</body>
+</html>

@@ -1,4 +1,6 @@
-const CACHE_NAME = 'math-invaders-v1';
+const CACHE_VERSION = '1769014074609'; // Increment this for each deployment
+const CACHE_NAME = `math-invaders-v${CACHE_VERSION}`;
+const STATIC_CACHE = `math-invaders-static-v${CACHE_VERSION}`;
 const urlsToCache = [
   '/',
   '/index.html',
@@ -27,47 +29,82 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - network-first for app files, cache-first for static assets
 self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+  
+  // Only handle http/https requests
+  if (!url.protocol.startsWith('http')) {
+    return;
+  }
+  
   // Handle navigation requests
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      caches.match(event.request)
+      fetch(event.request)
         .then(response => {
-          if (response) {
-            return response;
+          // Update cache with fresh content
+          if (response.ok && event.request.url.startsWith('http')) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME)
+              .then(cache => cache.put(event.request, responseToCache))
+              .catch(err => console.warn('Failed to cache navigation request:', err));
           }
-          
-          return fetch(event.request).catch(() => {
-            return caches.match('/offline.html');
-          });
+          return response;
+        })
+        .catch(() => {
+          // Fallback to cache, then offline page
+          return caches.match(event.request)
+            .then(cachedResponse => cachedResponse || caches.match('/offline.html'));
         })
     );
     return;
   }
 
-  // Handle other requests
+  // Network-first for app files (JS, CSS, TS)
+  if (url.pathname.includes('/src/') || url.pathname.endsWith('.ts') || url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          if (response.ok && event.request.url.startsWith('http')) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME)
+              .then(cache => cache.put(event.request, responseToCache))
+              .catch(err => console.warn('Failed to cache app file:', err));
+          }
+          return response;
+        })
+        .catch(() => {
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+
+  // Cache-first for static assets (images, manifest, etc.)
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Cache hit - return response
         if (response) {
           return response;
         }
         
         return fetch(event.request).then(response => {
-          // Check if we received a valid response
           if (!response || response.status !== 200 || response.type !== 'basic') {
             return response;
           }
 
-          // Clone the response
-          const responseToCache = response.clone();
+          // Only cache HTTP(S) requests
+          if (!event.request.url.startsWith('http')) {
+            return response;
+          }
 
-          caches.open(CACHE_NAME)
+          const responseToCache = response.clone();
+          caches.open(STATIC_CACHE)
             .then(cache => {
               cache.put(event.request, responseToCache);
-            });
+            })
+            .catch(err => console.warn('Failed to cache static asset:', err));
 
           return response;
         });
@@ -81,7 +118,8 @@ self.addEventListener('activate', event => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
+          // Keep current cache and static cache, delete others
+          if (cacheName !== CACHE_NAME && cacheName !== STATIC_CACHE) {
             console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
@@ -91,4 +129,11 @@ self.addEventListener('activate', event => {
   );
   // Take control of all clients immediately
   self.clients.claim();
+});
+
+// Handle messages from the main thread
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });

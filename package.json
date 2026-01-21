@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "node deploy.js",
+    "force-update": "node -e \"const fs=require('fs');const v=Date.now();let c=fs.readFileSync('public/sw.js','utf8');c=c.replace(/const CACHE_VERSION = '[^']+'/,'const CACHE_VERSION = \\''+v+'\\'');fs.writeFileSync('public/sw.js',c);console.log('Cache version updated to:',v);\""
   },
   "dependencies": {
     "firebase": "^12.8.0",

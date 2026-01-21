@@ -26,8 +26,8 @@ export class AuthScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a2e);
 
     // Title
-    const title = this.add.text(width / 2, height / 6, 'MATH\nINVADERS', {
-      fontSize: '48px',
+    const title = this.add.text(width / 2, height / 8, 'MATH\nINVADERS', {
+      fontSize: `${Math.min(40, width * 0.1)}px`,
       color: '#00ff88',
       fontStyle: 'bold',
       align: 'center',
@@ -57,12 +57,13 @@ export class AuthScene extends Phaser.Scene {
       z-index: 1000;
       background: rgba(26, 26, 46, 0.95);
       backdrop-filter: blur(10px);
-      border-radius: 15px;
-      border: 2px solid #00ff88;
-      padding: 30px;
-      box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
-      min-width: 350px;
-      max-width: 90vw;
+      padding: 16px;
+      margin: 16px;
+      width: 92vw;
+      max-width: 380px;
+      min-width: 280px;
+      max-height: 85vh;
+      overflow-y: auto;
     `;
 
     // Create form container
@@ -70,8 +71,9 @@ export class AuthScene extends Phaser.Scene {
     this.formContainer.style.cssText = `
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
       font-family: Arial, sans-serif;
+      align-items: center;
     `;
 
     this.overlay.appendChild(this.formContainer);
@@ -88,8 +90,8 @@ export class AuthScene extends Phaser.Scene {
     title.style.cssText = `
       color: #00ff88;
       text-align: center;
-      margin: 0 0 20px 0;
-      font-size: 24px;
+      margin: 0 0 12px 0;
+      font-size: clamp(18px, 4.5vw, 22px);
       font-weight: bold;
     `;
 
@@ -102,12 +104,14 @@ export class AuthScene extends Phaser.Scene {
       background: #00ff88;
       color: #000;
       border: none;
-      padding: 15px;
+      padding: 14px;
       border-radius: 8px;
-      font-size: 16px;
+      font-size: clamp(14px, 4vw, 16px);
       font-weight: bold;
       cursor: pointer;
       transition: background 0.2s;
+      min-height: 46px;
+      width: 100%;
     `;
     submitButton.onmouseover = () => submitButton.style.background = '#00cc66';
     submitButton.onmouseout = () => submitButton.style.background = '#00ff88';
@@ -120,9 +124,12 @@ export class AuthScene extends Phaser.Scene {
       border: 1px solid #00ff88;
       padding: 10px;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: clamp(11px, 3.2vw, 13px);
       cursor: pointer;
       transition: all 0.2s;
+      min-height: 42px;
+      text-align: center;
+      width: 100%;
     `;
     toggleButton.onmouseover = () => {
       toggleButton.style.background = '#00ff88';
@@ -139,14 +146,33 @@ export class AuthScene extends Phaser.Scene {
       background: #4285f4;
       color: white;
       border: none;
-      padding: 12px;
+      padding: 10px;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: clamp(12px, 3.5vw, 14px);
       cursor: pointer;
       transition: background 0.2s;
+      min-height: 42px;
+      width: 100%;
     `;
     googleButton.onmouseover = () => googleButton.style.background = '#357ae8';
     googleButton.onmouseout = () => googleButton.style.background = '#4285f4';
+
+    const guestButton = document.createElement('button');
+    guestButton.textContent = 'Play as Guest';
+    guestButton.style.cssText = `
+      background: #666666;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: clamp(12px, 3.5vw, 14px);
+      cursor: pointer;
+      transition: background 0.2s;
+      min-height: 42px;
+      width: 100%;
+    `;
+    guestButton.onmouseover = () => guestButton.style.background = '#555555';
+    guestButton.onmouseout = () => guestButton.style.background = '#666666';
 
     const errorDiv = document.createElement('div');
     errorDiv.style.cssText = `
@@ -192,6 +218,11 @@ export class AuthScene extends Phaser.Scene {
       }
     };
 
+    guestButton.onclick = () => {
+      this.cleanupHTML();
+      this.scene.start('MainMenu');
+    };
+
     // Add enter key support
     const handleEnter = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
@@ -208,6 +239,7 @@ export class AuthScene extends Phaser.Scene {
     this.formContainer.appendChild(toggleButton);
     this.formContainer.appendChild(document.createElement('hr'));
     this.formContainer.appendChild(googleButton);
+    this.formContainer.appendChild(guestButton);
     this.formContainer.appendChild(errorDiv);
   }
 
@@ -216,14 +248,17 @@ export class AuthScene extends Phaser.Scene {
     input.type = type;
     input.placeholder = placeholder;
     input.style.cssText = `
-      padding: 12px;
+      padding: 13px 12px;
       border: 1px solid #333;
       border-radius: 8px;
       background: #2a2a3e;
       color: white;
-      font-size: 16px;
+      font-size: clamp(14px, 4vw, 16px);
       outline: none;
       transition: border-color 0.2s;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 46px;
     `;
     input.onfocus = () => input.style.borderColor = '#00ff88';
     input.onblur = () => input.style.borderColor = '#333';
