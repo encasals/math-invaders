@@ -95,22 +95,22 @@ export class GameOver extends Phaser.Scene {
     // Restart button
     const restartButton = this.add.graphics();
     restartButton.fillStyle(0x00ff88, 1);
-    restartButton.fillRoundedRect(width / 2 - 250, height * 0.65, 180, 50, 12);
+    restartButton.fillRoundedRect(width / 2 - 90, height * 0.65, 180, 50, 12);
 
-    const restartText = this.add.text(width / 2 - 160, height * 0.65 + 25, 'PLAY AGAIN', {
+    const restartText = this.add.text(width / 2, height * 0.65 + 25, 'PLAY AGAIN', {
       fontSize: '24px',
       color: '#000000',
       fontStyle: 'bold',
     });
     restartText.setOrigin(0.5);
 
-    const restartHitArea = this.add.rectangle(width / 2 - 160, height * 0.65 + 25, 180, 50);
+    const restartHitArea = this.add.rectangle(width / 2, height * 0.65 + 25, 180, 50);
     restartHitArea.setInteractive({ useHandCursor: true });
 
     restartHitArea.on('pointerdown', () => {
       restartButton.clear();
       restartButton.fillStyle(0x00cc66, 1);
-      restartButton.fillRoundedRect(width / 2 - 250, height * 0.65, 180, 50, 12);
+      restartButton.fillRoundedRect(width / 2 - 90, height * 0.65, 180, 50, 12);
     });
 
     restartHitArea.on('pointerup', () => {
@@ -120,22 +120,22 @@ export class GameOver extends Phaser.Scene {
     // Menu button
     const menuButton = this.add.graphics();
     menuButton.fillStyle(0x4488ff, 1);
-    menuButton.fillRoundedRect(width / 2 - 250, height * 0.75, 180, 50, 12);
+    menuButton.fillRoundedRect(width / 2 - 90, height * 0.75, 180, 50, 12);
 
-    const menuText = this.add.text(width / 2 - 160, height * 0.75 + 25, 'MAIN MENU', {
+    const menuText = this.add.text(width / 2, height * 0.75 + 25, 'MAIN MENU', {
       fontSize: '24px',
       color: '#ffffff',
       fontStyle: 'bold',
     });
     menuText.setOrigin(0.5);
 
-    const menuHitArea = this.add.rectangle(width / 2 - 160, height * 0.75 + 25, 180, 50);
+    const menuHitArea = this.add.rectangle(width / 2, height * 0.75 + 25, 180, 50);
     menuHitArea.setInteractive({ useHandCursor: true });
 
     menuHitArea.on('pointerdown', () => {
       menuButton.clear();
       menuButton.fillStyle(0x3366cc, 1);
-      menuButton.fillRoundedRect(width / 2 - 250, height * 0.75, 180, 50, 12);
+      menuButton.fillRoundedRect(width / 2 - 90, height * 0.75, 180, 50, 12);
     });
 
     menuHitArea.on('pointerup', () => {
