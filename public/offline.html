@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#00ff88">
+  <title>Math Invaders - Offline</title>
+  <style>
+    body {
+      background: #1a1a2e;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    
+    .offline-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    
+    h1 {
+      color: #00ff88;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      font-size: 1.2rem;
+      color: #aaaaaa;
+      margin-bottom: 2rem;
+    }
+    
+    .retry-btn {
+      background: #00ff88;
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .retry-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-icon">📱</div>
+  <h1>Math Invaders</h1>
+  <p>You're offline, but the game is cached and ready to play!</p>
+  <button class="retry-btn" onclick="window.location.href='/'">
+    🚀 Launch Game
+  </button>
+</body>
+</html>

@@ -1,12 +1,15 @@
 {
   "name": "Math Invaders",
   "short_name": "MathInvaders",
-  "description": "A mobile-first web game combining Space Invaders with mental math",
+  "description": "A mobile-first web game combining Space Invaders with mental math. Sum numbers to destroy enemies!",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#00ff88",
   "orientation": "portrait",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["games", "education"],
   "icons": [
     {
       "src": "/icons/icon-192.png",
@@ -19,6 +22,24 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Play Game",
+      "short_name": "Play",
+      "description": "Start playing Math Invaders",
+      "url": "/",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

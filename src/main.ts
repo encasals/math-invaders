@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import './pwa-install.js';
 import { Boot } from './scenes/Boot';
 import { Preloader } from './scenes/Preloader';
 import { AuthScene } from './scenes/AuthScene';
