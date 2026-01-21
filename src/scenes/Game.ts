@@ -1,8 +1,10 @@
 import Phaser from 'phaser';
 import { Enemy } from '../objects/Enemy';
 import { Keypad } from '../objects/Keypad';
+import { AuthService } from '../firebase/authService';
 
 export class Game extends Phaser.Scene {
+  private authService: AuthService;
   private enemies: Enemy[] = [];
   private keypad!: Keypad;
   private score: number = 0;
@@ -12,12 +14,14 @@ export class Game extends Phaser.Scene {
   private gameWidth: number = 0;
   private difficultyLevel: number = 1;
   private enemiesDestroyed: number = 0;
+  private gameOverCalled: boolean = false;
 
   // Keypad values - 8 numbers for variety
   private readonly keypadValues = [1, 2, 3, 5, 7, 10, 15, 20];
 
   constructor() {
     super('Game');
+    this.authService = AuthService.getInstance();
   }
 
   create(): void {
@@ -29,6 +33,7 @@ export class Game extends Phaser.Scene {
     this.score = 0;
     this.difficultyLevel = 1;
     this.enemiesDestroyed = 0;
+    this.gameOverCalled = false;
 
     // Calculate floor position (above keypad area)
     const keypadHeight = 280;
@@ -249,24 +254,110 @@ export class Game extends Phaser.Scene {
 
       if (enemy.y >= this.floorY) {
         // Game over!
-        this.gameOver();
+        if (!this.gameOverCalled) {
+          this.gameOverCalled = true;
+          this.gameOver();
+        }
         return;
       }
     }
   }
 
-  private gameOver(): void {
+  private async gameOver(): Promise<void> {
     // Stop spawning
     if (this.spawnTimer) {
       this.spawnTimer.destroy();
     }
 
-    // Flash screen red
-    this.cameras.main.flash(500, 255, 0, 0);
+    let isNewRecord = false;
+    let previousScore = 0;
 
-    // Transition to game over scene
-    this.time.delayedCall(500, () => {
-      this.scene.start('GameOver', { score: this.score });
-    });
+    // Save high score to Firebase if user is signed in
+    if (this.authService.isSignedIn()) {
+      try {
+        const result = await this.authService.updateHighScore(this.score);
+        isNewRecord = result.isNewRecord;
+        previousScore = result.previousScore;
+        
+        if (isNewRecord) {
+          console.log(`New high score! Previous: ${previousScore}, New: ${this.score}`);
+          // Show new record notification
+          this.showNewRecordNotification();
+        } else {
+          console.log(`Score saved. Current high score: ${previousScore}`);
+        }
+      } catch (error) {
+        console.error('Error updating high score:', error);
+      }
+    } else {
+      // Fallback to local storage for guests
+      const currentHighScore = parseInt(localStorage.getItem('mathInvadersHighScore') || '0');
+      if (this.score > currentHighScore) {
+        localStorage.setItem('mathInvadersHighScore', this.score.toString());
+        isNewRecord = true;
+        previousScore = currentHighScore;
+        this.showNewRecordNotification();
+      }
+    }
+
+    // Flash screen red (with safety check)
+    if (this.cameras && this.cameras.main) {
+      this.cameras.main.flash(500, 255, 0, 0);
+    }
+
+    // Transition to game over scene with record info
+    if (this.time && this.scene) {
+      this.time.delayedCall(isNewRecord ? 1500 : 500, () => {
+        this.scene.start('GameOver', { 
+          score: this.score, 
+          isNewRecord, 
+          previousScore 
+        });
+      });
+    }
+  }
+
+  private showNewRecordNotification(): void {
+    // Safety check to ensure scene is still active
+    if (!this.scene || !this.scene.isActive() || !this.add || !this.cameras) {
+      return;
+    }
+
+    const recordText = this.add.text(
+      this.gameWidth / 2,
+      this.cameras.main.height / 2,
+      'NEW HIGH SCORE!',
+      {
+        fontSize: '48px',
+        color: '#ffaa00',
+        fontStyle: 'bold',
+        stroke: '#000000',
+        strokeThickness: 4
+      }
+    );
+    recordText.setOrigin(0.5);
+
+    // Add sparkle effect (with safety check)
+    if (this.tweens) {
+      this.tweens.add({
+        targets: recordText,
+        scale: { from: 0.5, to: 1.2 },
+        alpha: { from: 0, to: 1 },
+        duration: 500,
+        ease: 'Back.easeOut',
+        yoyo: true,
+        repeat: 1,
+        onComplete: () => {
+          if (recordText && recordText.destroy) {
+            recordText.destroy();
+          }
+        },
+      });
+    }
+
+    // Flash screen gold for new record (with safety check)
+    if (this.cameras && this.cameras.main) {
+      this.cameras.main.flash(200, 255, 215, 0, false);
+    }
   }
 }

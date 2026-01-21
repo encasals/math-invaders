@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 
 export class Boot extends Phaser.Scene {
+
   constructor() {
     super('Boot');
   }
@@ -14,8 +15,10 @@ export class Boot extends Phaser.Scene {
     // Set up game settings
     this.scale.on('resize', this.resize, this);
     
-    // Move to the preloader scene
-    this.scene.start('Preloader');
+    // Wait a moment for Firebase auth to initialize, then start preloader
+    this.time.delayedCall(100, () => {
+      this.scene.start('Preloader');
+    });
   }
 
   resize(gameSize: Phaser.Structs.Size): void {
