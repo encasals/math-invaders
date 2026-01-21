@@ -37,9 +37,12 @@ export class Keypad extends Phaser.GameObjects.Container {
     this.sumDisplay.setOrigin(0.5);
     this.add(this.sumDisplay);
 
-    // Calculate grid layout
+    // Calculate grid layout - account for clear button in centering
+    const clearButtonWidth = 45;
+    const clearButtonPadding = 10;
     const totalButtonWidth = buttonsPerRow * buttonSize + (buttonsPerRow - 1) * padding;
-    const startX = -totalButtonWidth / 2 + buttonSize / 2;
+    const totalWidth = totalButtonWidth + clearButtonPadding + clearButtonWidth;
+    const startX = -totalWidth / 2 + buttonSize / 2;
 
     // Create buttons
     config.values.forEach((value, index) => {
@@ -57,9 +60,9 @@ export class Keypad extends Phaser.GameObjects.Container {
     // Create clear button
     const clearButton = this.createClearButton(
       scene,
-      startX + 4 * (buttonSize + padding) + 5,
+      startX + totalButtonWidth + clearButtonPadding + clearButtonWidth / 2 - buttonSize / 2,
       (buttonSize + padding) / 2,
-      45,
+      clearButtonWidth,
       buttonSize * 2 + padding
     );
     this.add(clearButton);
