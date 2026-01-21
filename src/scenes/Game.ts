@@ -9,6 +9,8 @@ export class Game extends Phaser.Scene {
   private keypad!: Keypad;
   private score: number = 0;
   private scoreText!: Phaser.GameObjects.Text;
+  private highScoreText!: Phaser.GameObjects.Text;
+  private personalHighScore: number = 0;
   private spawnTimer!: Phaser.Time.TimerEvent;
   private floorY: number = 0;
   private gameWidth: number = 0;
@@ -24,7 +26,7 @@ export class Game extends Phaser.Scene {
     this.authService = AuthService.getInstance();
   }
 
-  create(): void {
+  async create(): Promise<void> {
     this.gameWidth = this.cameras.main.width;
     const gameHeight = this.cameras.main.height;
 
@@ -34,6 +36,9 @@ export class Game extends Phaser.Scene {
     this.difficultyLevel = 1;
     this.enemiesDestroyed = 0;
     this.gameOverCalled = false;
+
+    // Load personal high score
+    await this.loadPersonalHighScore();
 
     // Calculate floor position (above keypad area)
     const keypadHeight = 280;
@@ -56,11 +61,12 @@ export class Game extends Phaser.Scene {
       fontStyle: 'bold',
     });
 
-    // Create level display
-    this.add.text(this.gameWidth - 20, 20, '', {
+    // Create personal high score display below current score
+    this.highScoreText = this.add.text(20, 50, `Best: ${this.personalHighScore}`, {
       fontSize: '18px',
-      color: '#aaaaaa',
-    }).setOrigin(1, 0);
+      color: '#ffaa00',
+      fontStyle: 'bold',
+    });
 
     // Create keypad at the bottom
     this.keypad = new Keypad(this, this.gameWidth / 2, gameHeight - 130, {
@@ -189,6 +195,9 @@ export class Game extends Phaser.Scene {
     const points = enemy.targetValue * 10;
     this.score += points;
     this.scoreText.setText(`Score: ${this.score}`);
+
+    // Update high score text
+    this.highScoreText.setText(`Best: ${this.personalHighScore}`);
 
     // Show floating score
     const floatingScore = this.add.text(enemy.x, enemy.y, `+${points}`, {
@@ -358,6 +367,21 @@ export class Game extends Phaser.Scene {
     // Flash screen gold for new record (with safety check)
     if (this.cameras && this.cameras.main) {
       this.cameras.main.flash(200, 255, 215, 0, false);
+    }
+  }
+
+  private async loadPersonalHighScore(): Promise<void> {
+    try {
+      if (this.authService.isSignedIn()) {
+        // Load from Firebase for signed-in users
+        this.personalHighScore = await this.authService.getUserHighScore();
+      } else {
+        // Load from local storage for guests
+        this.personalHighScore = parseInt(localStorage.getItem('mathInvadersHighScore') || '0');
+      }
+    } catch (error) {
+      console.error('Error loading personal high score:', error);
+      this.personalHighScore = 0;
     }
   }
 }
