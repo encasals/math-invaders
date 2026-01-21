@@ -31,7 +31,7 @@ export class Game extends Phaser.Scene {
     this.enemiesDestroyed = 0;
 
     // Calculate floor position (above keypad area)
-    const keypadHeight = 220;
+    const keypadHeight = 280;
     this.floorY = gameHeight - keypadHeight;
 
     // Create floor line (visual indicator)
@@ -58,7 +58,7 @@ export class Game extends Phaser.Scene {
     }).setOrigin(1, 0);
 
     // Create keypad at the bottom
-    this.keypad = new Keypad(this, this.gameWidth / 2, gameHeight - 90, {
+    this.keypad = new Keypad(this, this.gameWidth / 2, gameHeight - 130, {
       values: this.keypadValues,
       onValueSelected: this.onNumberSelected.bind(this),
     });

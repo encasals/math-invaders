@@ -18,18 +18,18 @@ export class Keypad extends Phaser.GameObjects.Container {
     this.onValueSelected = config.onValueSelected;
 
     const width = scene.cameras.main.width;
-    const buttonSize = 70;
-    const padding = 10;
+    const buttonSize = Math.min(65, (width - 100) / 5);
+    const padding = 8;
     const buttonsPerRow = 4;
 
     // Create sum display background
     this.sumBackground = scene.add.graphics();
     this.sumBackground.fillStyle(0x222233, 1);
-    this.sumBackground.fillRoundedRect(-width / 2 + 20, -110, width - 40, 50, 10);
+    this.sumBackground.fillRoundedRect(-width / 2 + 20, -130, width - 40, 45, 10);
     this.add(this.sumBackground);
 
     // Create sum display text
-    this.sumDisplay = scene.add.text(0, -85, 'Sum: 0', {
+    this.sumDisplay = scene.add.text(0, -107, 'Sum: 0', {
       fontSize: '28px',
       color: '#00ff88',
       fontStyle: 'bold',
@@ -57,9 +57,9 @@ export class Keypad extends Phaser.GameObjects.Container {
     // Create clear button
     const clearButton = this.createClearButton(
       scene,
-      startX + 4 * (buttonSize + padding) + 10,
+      startX + 4 * (buttonSize + padding) + 5,
       (buttonSize + padding) / 2,
-      50,
+      45,
       buttonSize * 2 + padding
     );
     this.add(clearButton);
@@ -216,9 +216,9 @@ export class Keypad extends Phaser.GameObjects.Container {
     this.sumBackground.fillStyle(0x442222, 1);
     this.sumBackground.fillRoundedRect(
       -this.scene.cameras.main.width / 2 + 20,
-      -110,
+      -130,
       this.scene.cameras.main.width - 40,
-      50,
+      45,
       10
     );
 
@@ -228,9 +228,9 @@ export class Keypad extends Phaser.GameObjects.Container {
       this.sumBackground.fillStyle(0x222233, 1);
       this.sumBackground.fillRoundedRect(
         -this.scene.cameras.main.width / 2 + 20,
-        -110,
+        -130,
         this.scene.cameras.main.width - 40,
-        50,
+        45,
         10
       );
     });
@@ -243,9 +243,9 @@ export class Keypad extends Phaser.GameObjects.Container {
     this.sumBackground.fillStyle(0x224422, 1);
     this.sumBackground.fillRoundedRect(
       -this.scene.cameras.main.width / 2 + 20,
-      -110,
+      -130,
       this.scene.cameras.main.width - 40,
-      50,
+      45,
       10
     );
 
@@ -255,9 +255,9 @@ export class Keypad extends Phaser.GameObjects.Container {
       this.sumBackground.fillStyle(0x222233, 1);
       this.sumBackground.fillRoundedRect(
         -this.scene.cameras.main.width / 2 + 20,
-        -110,
+        -130,
         this.scene.cameras.main.width - 40,
-        50,
+        45,
         10
       );
     });
