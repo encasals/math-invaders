@@ -13,18 +13,18 @@ export class Enemy extends Phaser.GameObjects.Container {
     this.targetValue = value;
     this.speed = speed;
 
-    // Create background
+    // Create background - Space Invaders green
     this.background = scene.add.graphics();
-    this.background.fillStyle(0xff4444, 1);
+    this.background.fillStyle(0x00ff00, 1);
     this.background.fillRoundedRect(-40, -30, 80, 60, 10);
-    this.background.lineStyle(3, 0xffffff, 0.8);
+    this.background.lineStyle(2, 0x88ff88, 0.9);
     this.background.strokeRoundedRect(-40, -30, 80, 60, 10);
     this.add(this.background);
 
-    // Create value text
+    // Create value text - dark for contrast on green
     this.valueText = scene.add.text(0, 0, value.toString(), {
       fontSize: '32px',
-      color: '#ffffff',
+      color: '#003300',
       fontStyle: 'bold',
     });
     this.valueText.setOrigin(0.5);
@@ -66,7 +66,7 @@ export class Enemy extends Phaser.GameObjects.Container {
       particles.destroy();
     });
 
-    // Flash effect
+    // Flash effect - green for Space Invaders style
     this.scene.cameras.main.flash(100, 0, 255, 136, false);
 
     this.destroy();

@@ -34,14 +34,14 @@ export class Game extends Phaser.Scene {
     const keypadHeight = 280;
     this.floorY = gameHeight - keypadHeight;
 
-    // Create floor line (visual indicator)
+    // Create floor line (visual indicator) - Space Invaders green
     const floorLine = this.add.graphics();
-    floorLine.lineStyle(3, 0xff4444, 0.8);
+    floorLine.lineStyle(3, 0x00ff00, 0.8);
     floorLine.lineBetween(0, this.floorY, this.gameWidth, this.floorY);
 
-    // Add danger zone gradient
+    // Add danger zone gradient - green theme
     const dangerZone = this.add.graphics();
-    dangerZone.fillGradientStyle(0xff0000, 0xff0000, 0xff0000, 0xff0000, 0.3, 0, 0.3, 0);
+    dangerZone.fillGradientStyle(0x00ff00, 0x00ff00, 0x00ff00, 0x00ff00, 0.3, 0, 0.3, 0);
     dangerZone.fillRect(0, this.floorY - 60, this.gameWidth, 60);
 
     // Create score display
