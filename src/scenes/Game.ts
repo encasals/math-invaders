@@ -138,8 +138,20 @@ export class Game extends Phaser.Scene {
 
   private generateTargetValue(): number {
     // Generate sums that are achievable with the keypad values
-    // Pick 1-4 random values from the keypad and sum them
-    const numValues = Phaser.Math.Between(1, Math.min(4, 1 + Math.floor(this.difficultyLevel / 2)));
+    // Difficulty scales with score: harder sums as score increases
+    const scoreDifficulty = this.getScoreDifficulty();
+    const timeDifficulty = Math.min(4, 1 + Math.floor(this.difficultyLevel / 2));
+    
+    // Use the higher of score-based or time-based difficulty
+    const maxValues = Math.max(scoreDifficulty.maxValues, timeDifficulty);
+    const minValues = scoreDifficulty.minValues;
+    
+    // At 3000+ score, use harder generation with bias towards larger/trickier numbers
+    if (this.score >= 3000) {
+      return this.generateHardTargetValue(minValues, maxValues);
+    }
+    
+    const numValues = Phaser.Math.Between(minValues, maxValues);
     let sum = 0;
 
     for (let i = 0; i < numValues; i++) {
@@ -149,6 +161,49 @@ export class Game extends Phaser.Scene {
 
     // Clamp to reasonable range
     return Math.min(sum, 99);
+  }
+
+  private generateHardTargetValue(minValues: number, maxValues: number): number {
+    // Harder number generation for expert players (3000+ score)
+    // Bias towards larger keypad values and trickier combinations
+    const hardKeypadValues = [5, 7, 10, 15, 20]; // Exclude easy 1, 2, 3
+    const numValues = Phaser.Math.Between(minValues, maxValues);
+    let sum = 0;
+
+    for (let i = 0; i < numValues; i++) {
+      // 70% chance to use harder values, 30% chance for any value
+      if (Phaser.Math.Between(1, 100) <= 70) {
+        sum += Phaser.Utils.Array.GetRandom(hardKeypadValues);
+      } else {
+        sum += Phaser.Utils.Array.GetRandom(this.keypadValues);
+      }
+    }
+
+    // Occasionally generate "weird" numbers that require exact combinations
+    // These are valid sums but less intuitive (e.g., 37 = 15 + 15 + 7, or 52 = 20 + 20 + 7 + 5)
+    if (Phaser.Math.Between(1, 100) <= 40) {
+      // Generate a tricky target that requires thinking
+      const trickyTargets = [
+        27, 32, 37, 42, 47, 52, 57, 62, // Require careful combinations
+        33, 38, 43, 48, 53, 58, 63,     // Odd-ish numbers needing 3+ values
+        45, 50, 55, 60, 65, 70, 75, 80  // Higher round-ish numbers
+      ];
+      return Phaser.Utils.Array.GetRandom(trickyTargets);
+    }
+
+    return Math.min(sum, 99);
+  }
+
+  private getScoreDifficulty(): { minValues: number; maxValues: number } {
+    if (this.score >= 3000) {
+      return { minValues: 2, maxValues: 4 };
+    } else if (this.score >= 1500) {
+      return { minValues: 2, maxValues: 4 };
+    } else if (this.score >= 500) {
+      return { minValues: 1, maxValues: 3 };
+    } else {
+      return { minValues: 1, maxValues: 2 };
+    }
   }
 
   private onNumberSelected(_value: number): void {
