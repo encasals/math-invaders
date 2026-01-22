@@ -371,17 +371,10 @@ export class Game extends Phaser.Scene {
   }
 
   private async loadPersonalHighScore(): Promise<void> {
-    try {
-      if (this.authService.isSignedIn()) {
-        // Load from Firebase for signed-in users
-        this.personalHighScore = await this.authService.getUserHighScore();
-      } else {
-        // Load from local storage for guests
-        this.personalHighScore = parseInt(localStorage.getItem('mathInvadersHighScore') || '0');
-      }
-    } catch (error) {
-      console.error('Error loading personal high score:', error);
-      this.personalHighScore = 0;
+    if (this.authService.isSignedIn()) {
+      this.personalHighScore = await this.authService.getUserHighScore();
+    } else {
+      this.personalHighScore = parseInt(localStorage.getItem('highScore') || '0', 10);
     }
   }
 }

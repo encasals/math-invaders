@@ -2,7 +2,6 @@ import Phaser from 'phaser';
 import './pwa-install.js';
 import { Boot } from './scenes/Boot';
 import { Preloader } from './scenes/Preloader';
-import { AuthScene } from './scenes/AuthScene';
 import { MainMenu } from './scenes/MainMenu';
 import { ProfileScene } from './scenes/ProfileScene';
 import { HighScoresScene } from './scenes/HighScoresScene';
@@ -27,7 +26,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false,
     },
   },
-  scene: [Boot, Preloader, AuthScene, MainMenu, ProfileScene, HighScoresScene, HowToPlayScene, Game, GameOver],
+  scene: [Boot, Preloader, MainMenu, ProfileScene, HighScoresScene, HowToPlayScene, Game, GameOver],
 };
 
 const game = new Phaser.Game(config);

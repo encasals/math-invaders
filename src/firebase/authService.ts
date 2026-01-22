@@ -160,7 +160,14 @@ export class AuthService {
 
   // Update user's high score
   public async updateHighScore(score: number): Promise<{ isNewRecord: boolean; previousScore: number }> {
-    if (!this.currentUser) return { isNewRecord: false, previousScore: 0 };
+    if (!this.currentUser) {
+      const localHighScore = parseInt(localStorage.getItem('highScore') || '0', 10);
+      if (score > localHighScore) {
+        localStorage.setItem('highScore', score.toString());
+        return { isNewRecord: true, previousScore: localHighScore };
+      }
+      return { isNewRecord: false, previousScore: localHighScore };
+    }
 
     const userRef = doc(db, 'users', this.currentUser.uid);
     const userDoc = await getDoc(userRef);
