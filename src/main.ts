@@ -5,6 +5,7 @@ import { Preloader } from './scenes/Preloader';
 import { MainMenu } from './scenes/MainMenu';
 import { HowToPlayScene } from './scenes/HowToPlayScene';
 import { Game } from './scenes/Game';
+import { DailyGame } from './scenes/DailyGame';
 import { GameOver } from './scenes/GameOver';
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -24,7 +25,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false,
     },
   },
-  scene: [Boot, Preloader, MainMenu, HowToPlayScene, Game, GameOver],
+  scene: [Boot, Preloader, MainMenu, HowToPlayScene, Game, DailyGame, GameOver],
 };
 
 const game = new Phaser.Game(config);

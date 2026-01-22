@@ -4,28 +4,42 @@ export class GameOver extends Phaser.Scene {
   private finalScore: number = 0;
   private isNewRecord: boolean = false;
   private previousScore: number = 0;
+  private isDaily: boolean = false;
+  private dailyOperation: string = '';
 
   constructor() {
     super('GameOver');
   }
 
-  init(data: { score: number; isNewRecord?: boolean; previousScore?: number }): void {
+  init(data: { score: number; isNewRecord?: boolean; previousScore?: number; isDaily?: boolean; dailyOperation?: string }): void {
     this.finalScore = data.score || 0;
     this.isNewRecord = data.isNewRecord || false;
     this.previousScore = data.previousScore || 0;
+    this.isDaily = data.isDaily || false;
+    this.dailyOperation = data.dailyOperation || '';
   }
 
   create(): void {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
-    // Game Over title
+    // Game Over title - different color for daily
+    const titleColor = this.isDaily ? '#ff8800' : '#ff4444';
     const gameOverText = this.add.text(width / 2, height / 4, 'GAME OVER', {
       fontSize: '48px',
-      color: '#ff4444',
+      color: titleColor,
       fontStyle: 'bold',
     });
     gameOverText.setOrigin(0.5);
+
+    // Show daily challenge info if applicable
+    if (this.isDaily) {
+      const dailyLabel = this.add.text(width / 2, height / 4 + 40, `🎯 Daily: ${this.dailyOperation}`, {
+        fontSize: '18px',
+        color: '#ff8800',
+      });
+      dailyLabel.setOrigin(0.5);
+    }
 
     // Score display
     const scoreText = this.add.text(width / 2, height / 2 - 50, `Score: ${this.finalScore}`, {
@@ -100,7 +114,7 @@ export class GameOver extends Phaser.Scene {
     });
 
     restartHitArea.on('pointerup', () => {
-      this.scene.start('Game');
+      this.scene.start(this.isDaily ? 'DailyGame' : 'Game');
     });
 
     // Menu button
@@ -178,8 +192,16 @@ export class GameOver extends Phaser.Scene {
 
   private shareScore(): void {
     // Uses emojis for visual hierarchy
-    const shareTitle = `🏆 New High Score in Math-Invaders!`;
-    const shareText = `🚀 I just hit ${this.finalScore} points in Math-Invaders! \n\n👾 Can you beat my high score? \n\nPlay here 👇`;
+    let shareTitle: string;
+    let shareText: string;
+    
+    if (this.isDaily) {
+      shareTitle = `🎯 Daily Challenge Score in Math-Invaders!`;
+      shareText = `🎯 I scored ${this.finalScore} points in today's Math-Invaders Daily Challenge! \n\n📐 Today's challenge: ${this.dailyOperation}\n\n👾 Can you beat my score? \n\nPlay here 👇`;
+    } else {
+      shareTitle = `🏆 New High Score in Math-Invaders!`;
+      shareText = `🚀 I just hit ${this.finalScore} points in Math-Invaders! \n\n👾 Can you beat my high score? \n\nPlay here 👇`;
+    }
 
     // Example: Using the Web Share API if available
     if (navigator.share) {

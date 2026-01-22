@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { getDailyConfig, getDailyChallengeDescription, getDailyChallengeHighScore } from '../utils/DailyChallenge';
 
 export class MainMenu extends Phaser.Scene {
   constructor() {
@@ -27,6 +28,7 @@ export class MainMenu extends Phaser.Scene {
     const userInfoY = isSmallScreen ? height * 0.22 : height * 0.26;
     const howToPlayButtonY = isSmallScreen ? height * 0.30 : height * 0.36;
     const startButtonY = isSmallScreen ? height * 0.38 : height * 0.46;
+    const dailyButtonY = isSmallScreen ? height * 0.50 : height * 0.58;
 
     // Title
     const title = this.add.text(width / 2, titleY, 'MATH\nINVADERS', {
@@ -83,6 +85,9 @@ export class MainMenu extends Phaser.Scene {
       startButton.fillStyle(0x00ff88, 1);
       startButton.fillRoundedRect(width / 2 - buttonWidth/2, startButtonY, buttonWidth, buttonHeight, 15);
     });
+
+    // Daily Challenge button
+    this.createDailyChallengeButton(width, dailyButtonY, isSmallScreen);
   }
 
   private async displayUserInfo(width: number, baseY: number, isSmallScreen: boolean): Promise<void> {
@@ -129,6 +134,65 @@ export class MainMenu extends Phaser.Scene {
       howToPlayButton.clear();
       howToPlayButton.fillStyle(0x8833ff, 1);
       howToPlayButton.fillRoundedRect(width / 2 - buttonWidth/2, buttonY, buttonWidth, buttonHeight, 10);
+    });
+  }
+
+  private createDailyChallengeButton(width: number, buttonY: number, isSmallScreen: boolean): void {
+    const buttonWidth = isSmallScreen ? 200 : 220;
+    const buttonHeight = isSmallScreen ? 50 : 60;
+    
+    // Get daily challenge info
+    const dailyConfig = getDailyConfig();
+    const dailyDesc = getDailyChallengeDescription(dailyConfig);
+    const dailyHighScore = getDailyChallengeHighScore();
+
+    // Daily Challenge button - orange theme
+    const dailyButton = this.add.graphics();
+    dailyButton.fillStyle(0xff8800, 1);
+    dailyButton.fillRoundedRect(width / 2 - buttonWidth/2, buttonY, buttonWidth, buttonHeight, 15);
+
+    // Button text with emoji
+    const dailyText = this.add.text(width / 2, buttonY + buttonHeight/2 - 5, '🎯 DAILY CHALLENGE', {
+      fontSize: isSmallScreen ? '16px' : '20px',
+      color: '#000000',
+      fontStyle: 'bold',
+    });
+    dailyText.setOrigin(0.5);
+
+    // Sub-text showing today's operation
+    const subText = this.add.text(width / 2, buttonY + buttonHeight/2 + 12, dailyDesc, {
+      fontSize: isSmallScreen ? '11px' : '13px',
+      color: '#442200',
+    });
+    subText.setOrigin(0.5);
+
+    // Show daily high score below button
+    if (dailyHighScore > 0) {
+      const dailyScoreText = this.add.text(width / 2, buttonY + buttonHeight + 8, `Today's Best: ${dailyHighScore}`, {
+        fontSize: isSmallScreen ? '12px' : '14px',
+        color: '#ff8800',
+      });
+      dailyScoreText.setOrigin(0.5);
+    }
+
+    // Make button interactive
+    const hitArea = this.add.rectangle(width / 2, buttonY + buttonHeight/2, buttonWidth, buttonHeight);
+    hitArea.setInteractive({ useHandCursor: true });
+
+    hitArea.on('pointerdown', () => {
+      dailyButton.clear();
+      dailyButton.fillStyle(0xcc6600, 1);
+      dailyButton.fillRoundedRect(width / 2 - buttonWidth/2, buttonY, buttonWidth, buttonHeight, 15);
+    });
+
+    hitArea.on('pointerup', () => {
+      this.scene.start('DailyGame');
+    });
+
+    hitArea.on('pointerout', () => {
+      dailyButton.clear();
+      dailyButton.fillStyle(0xff8800, 1);
+      dailyButton.fillRoundedRect(width / 2 - buttonWidth/2, buttonY, buttonWidth, buttonHeight, 15);
     });
   }
 
