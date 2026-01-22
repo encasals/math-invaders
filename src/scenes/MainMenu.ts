@@ -27,7 +27,6 @@ export class MainMenu extends Phaser.Scene {
     const userInfoY = isSmallScreen ? height * 0.22 : height * 0.26;
     const howToPlayButtonY = isSmallScreen ? height * 0.30 : height * 0.36;
     const startButtonY = isSmallScreen ? height * 0.38 : height * 0.46;
-    const highScoreButtonY = isSmallScreen ? height * 0.46 : height * 0.56;
 
     // Title
     const title = this.add.text(width / 2, titleY, 'MATH\nINVADERS', {
@@ -84,9 +83,6 @@ export class MainMenu extends Phaser.Scene {
       startButton.fillStyle(0x00ff88, 1);
       startButton.fillRoundedRect(width / 2 - buttonWidth/2, startButtonY, buttonWidth, buttonHeight, 15);
     });
-
-    // High Scores Button
-    this.createHighScoresButton(width, highScoreButtonY, isSmallScreen);
   }
 
   private async displayUserInfo(width: number, baseY: number, isSmallScreen: boolean): Promise<void> {
@@ -97,43 +93,6 @@ export class MainMenu extends Phaser.Scene {
       color: '#ffaa00',
     });
     highScoreText.setOrigin(0.5);
-  }
-
-  private createHighScoresButton(width: number, buttonY: number, isSmallScreen: boolean): void {
-    const buttonWidth = isSmallScreen ? 180 : 200;
-    const buttonHeight = isSmallScreen ? 40 : 50;
-    
-    // High Scores button
-    const highScoresButton = this.add.graphics();
-    highScoresButton.fillStyle(0x4444ff, 1);
-    highScoresButton.fillRoundedRect(width / 2 - buttonWidth/2, buttonY, buttonWidth, buttonHeight, 12);
-
-    const highScoresText = this.add.text(width / 2, buttonY + buttonHeight/2, 'HIGH SCORES', {
-      fontSize: isSmallScreen ? '16px' : '20px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    });
-    highScoresText.setOrigin(0.5);
-
-    // Make button interactive
-    const hitArea = this.add.rectangle(width / 2, buttonY + buttonHeight/2, buttonWidth, buttonHeight);
-    hitArea.setInteractive({ useHandCursor: true });
-
-    hitArea.on('pointerdown', () => {
-      highScoresButton.clear();
-      highScoresButton.fillStyle(0x3333cc, 1);
-      highScoresButton.fillRoundedRect(width / 2 - buttonWidth/2, buttonY, buttonWidth, buttonHeight, 12);
-    });
-
-    hitArea.on('pointerup', () => {
-      this.scene.start('HighScoresScene');
-    });
-
-    hitArea.on('pointerout', () => {
-      highScoresButton.clear();
-      highScoresButton.fillStyle(0x4444ff, 1);
-      highScoresButton.fillRoundedRect(width / 2 - buttonWidth/2, buttonY, buttonWidth, buttonHeight, 12);
-    });
   }
 
   private createHowToPlayButton(width: number, buttonY: number, isSmallScreen: boolean): void {

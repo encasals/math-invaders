@@ -1,10 +1,8 @@
 import Phaser from 'phaser';
 import { Enemy } from '../objects/Enemy';
 import { Keypad } from '../objects/Keypad';
-import { AuthService } from '../firebase/authService';
 
 export class Game extends Phaser.Scene {
-  private authService: AuthService;
   private enemies: Enemy[] = [];
   private keypad!: Keypad;
   private score: number = 0;
@@ -23,7 +21,6 @@ export class Game extends Phaser.Scene {
 
   constructor() {
     super('Game');
-    this.authService = AuthService.getInstance();
   }
 
   async create(): Promise<void> {
@@ -73,6 +70,22 @@ export class Game extends Phaser.Scene {
       values: this.keypadValues,
       onValueSelected: this.onNumberSelected.bind(this),
     });
+
+    // Adjust for safe area on Android devices with on-screen navigation buttons
+    const safeAreaPadding = 50; // Adjust this value as needed
+
+    // Adjust keypad position to account for safe area
+    this.keypad.setPosition(this.gameWidth / 2, gameHeight - 130 - safeAreaPadding);
+
+    // Adjust danger zone position
+    dangerZone.clear();
+    dangerZone.fillGradientStyle(0x00ff00, 0x00ff00, 0x00ff00, 0x00ff00, 0.3, 0, 0.3, 0);
+    dangerZone.fillRect(0, this.floorY - 60 - safeAreaPadding, this.gameWidth, 60);
+
+    // Adjust floor line position
+    floorLine.clear();
+    floorLine.lineStyle(3, 0x00ff00, 0.8);
+    floorLine.lineBetween(0, this.floorY - safeAreaPadding, this.gameWidth, this.floorY - safeAreaPadding);
 
     // Start spawning enemies
     this.startSpawning();
@@ -282,31 +295,13 @@ export class Game extends Phaser.Scene {
     let previousScore = 0;
 
     // Save high score to Firebase if user is signed in
-    if (this.authService.isSignedIn()) {
-      try {
-        const result = await this.authService.updateHighScore(this.score);
-        isNewRecord = result.isNewRecord;
-        previousScore = result.previousScore;
-        
-        if (isNewRecord) {
-          console.log(`New high score! Previous: ${previousScore}, New: ${this.score}`);
-          // Show new record notification
-          this.showNewRecordNotification();
-        } else {
-          console.log(`Score saved. Current high score: ${previousScore}`);
-        }
-      } catch (error) {
-        console.error('Error updating high score:', error);
-      }
-    } else {
-      // Fallback to local storage for guests
-      const currentHighScore = parseInt(localStorage.getItem('mathInvadersHighScore') || '0');
-      if (this.score > currentHighScore) {
-        localStorage.setItem('mathInvadersHighScore', this.score.toString());
-        isNewRecord = true;
-        previousScore = currentHighScore;
-        this.showNewRecordNotification();
-      }
+    // Fallback to local storage for guests
+    const currentHighScore = parseInt(localStorage.getItem('mathInvadersHighScore') || '0');
+    if (this.score > currentHighScore) {
+      localStorage.setItem('mathInvadersHighScore', this.score.toString());
+      isNewRecord = true;
+      previousScore = currentHighScore;
+      this.showNewRecordNotification();
     }
 
     // Flash screen red (with safety check)
@@ -371,10 +366,6 @@ export class Game extends Phaser.Scene {
   }
 
   private async loadPersonalHighScore(): Promise<void> {
-    if (this.authService.isSignedIn()) {
-      this.personalHighScore = await this.authService.getUserHighScore();
-    } else {
-      this.personalHighScore = parseInt(localStorage.getItem('highScore') || '0', 10);
-    }
+    this.personalHighScore = parseInt(localStorage.getItem('highScore') || '0', 10);
   }
 }

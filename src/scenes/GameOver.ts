@@ -1,15 +1,12 @@
 import Phaser from 'phaser';
-import { AuthService } from '../firebase/authService';
 
 export class GameOver extends Phaser.Scene {
-  private authService: AuthService;
   private finalScore: number = 0;
   private isNewRecord: boolean = false;
   private previousScore: number = 0;
 
   constructor() {
     super('GameOver');
-    this.authService = AuthService.getInstance();
   }
 
   init(data: { score: number; isNewRecord?: boolean; previousScore?: number }): void {
@@ -45,11 +42,6 @@ export class GameOver extends Phaser.Scene {
         fontStyle: 'bold',
       });
       newRecordText.setOrigin(0.5);
-
-      // Save high score locally if not logged in
-      if (!this.authService.isSignedIn()) {
-        localStorage.setItem('highScore', this.finalScore.toString());
-      }
 
       // Show improvement
       if (this.previousScore > 0) {
@@ -160,6 +152,28 @@ export class GameOver extends Phaser.Scene {
     shareHitArea.on('pointerup', () => {
       this.shareScore();
     });
+
+    // Adjust for safe area on Android devices with on-screen navigation buttons
+    const safeAreaPadding = 50; // Adjust this value as needed
+
+    // Adjust positions of buttons to account for safe area
+    restartButton.clear();
+    restartButton.fillStyle(0x00ff88, 1);
+    restartButton.fillRoundedRect(width / 2 - 90, height * 0.65 - safeAreaPadding, 180, 50, 12);
+    restartText.setY(height * 0.65 + 25 - safeAreaPadding);
+    restartHitArea.setY(height * 0.65 + 25 - safeAreaPadding);
+
+    menuButton.clear();
+    menuButton.fillStyle(0x4488ff, 1);
+    menuButton.fillRoundedRect(width / 2 - 90, height * 0.75 - safeAreaPadding, 180, 50, 12);
+    menuText.setY(height * 0.75 + 25 - safeAreaPadding);
+    menuHitArea.setY(height * 0.75 + 25 - safeAreaPadding);
+
+    shareButton.clear();
+    shareButton.fillStyle(0xffcc00, 1);
+    shareButton.fillRoundedRect(width / 2 - 90, height * 0.85 - safeAreaPadding, 180, 50, 12);
+    shareText.setY(height * 0.85 + 25 - safeAreaPadding);
+    shareHitArea.setY(height * 0.85 + 25 - safeAreaPadding);
   }
 
   private shareScore(): void {

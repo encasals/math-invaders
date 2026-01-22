@@ -3,8 +3,6 @@ import './pwa-install.js';
 import { Boot } from './scenes/Boot';
 import { Preloader } from './scenes/Preloader';
 import { MainMenu } from './scenes/MainMenu';
-import { ProfileScene } from './scenes/ProfileScene';
-import { HighScoresScene } from './scenes/HighScoresScene';
 import { HowToPlayScene } from './scenes/HowToPlayScene';
 import { Game } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
@@ -26,7 +24,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false,
     },
   },
-  scene: [Boot, Preloader, MainMenu, ProfileScene, HighScoresScene, HowToPlayScene, Game, GameOver],
+  scene: [Boot, Preloader, MainMenu, HowToPlayScene, Game, GameOver],
 };
 
 const game = new Phaser.Game(config);
