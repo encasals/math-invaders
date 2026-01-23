@@ -8,7 +8,6 @@ import {
   saveDailyChallengeScore,
   getDailyChallengeHighScore,
   DailyConfig,
-  OperationType,
 } from '../utils/DailyChallenge';
 
 export class DailyGame extends Phaser.Scene {
@@ -130,16 +129,7 @@ export class DailyGame extends Phaser.Scene {
   }
 
   private getOperationHint(): string {
-    switch (this.dailyConfig.operation) {
-      case OperationType.Addition:
-        return `Find: ${this.dailyConfig.baseNumber} + ? = Enemy`;
-      case OperationType.Subtraction:
-        return `Find: Enemy - ${this.dailyConfig.baseNumber} = ?`;
-      case OperationType.Multiplication:
-        return `Find: ${this.dailyConfig.baseNumber} × ? = Enemy`;
-      case OperationType.Division:
-        return `Find: Enemy ÷ ${this.dailyConfig.baseNumber} = ?`;
-    }
+    return getDailyChallengeDescription(this.dailyConfig);
   }
 
   private startSpawning(): void {
@@ -163,8 +153,8 @@ export class DailyGame extends Phaser.Scene {
   }
 
   private spawnEnemy(): void {
-    // Generate target value using daily challenge logic
-    const enemyData = generateDailyEnemyValue(this.dailyConfig, this.keypadValues);
+    // Generate target value using daily challenge logic, passing current score for difficulty scaling
+    const enemyData = generateDailyEnemyValue(this.dailyConfig, this.keypadValues, this.score);
 
     // Random X position with margin
     const margin = 60;

@@ -121,55 +121,91 @@ export function getDailyConfig(): DailyConfig {
 }
 
 /**
+ * Gets the number of keypad values to combine based on score
+ */
+function getNumValuesByScore(score: number): { min: number; max: number } {
+  if (score >= 3000) {
+    return { min: 2, max: 4 };
+  } else if (score >= 1500) {
+    return { min: 2, max: 4 };
+  } else if (score >= 500) {
+    return { min: 1, max: 3 };
+  } else {
+    return { min: 1, max: 2 };
+  }
+}
+
+/**
+ * Generates a target value by combining multiple keypad values
+ */
+function generateCombinedTarget(keypadValues: number[], score: number): number {
+  const { min, max } = getNumValuesByScore(score);
+  const numValues = Math.floor(Math.random() * (max - min + 1)) + min;
+  
+  let sum = 0;
+  for (let i = 0; i < numValues; i++) {
+    const randomValue = keypadValues[Math.floor(Math.random() * keypadValues.length)];
+    sum += randomValue;
+  }
+  
+  return sum;
+}
+
+/**
  * Generates an enemy value for the daily challenge based on operation type
+ * Formula: baseNumber OP target = displayValue
+ * The target value scales with score (more keypad numbers combined at higher scores)
  */
 export function generateDailyEnemyValue(
   config: DailyConfig,
-  keypadValues: number[]
+  keypadValues: number[],
+  score: number = 0
 ): { displayValue: number; targetValue: number; equation: string } {
-  // Pick a random keypad value as the player's "input"
-  const playerValue = keypadValues[Math.floor(Math.random() * keypadValues.length)];
+  // Generate target by combining multiple keypad values based on score
+  let targetValue = generateCombinedTarget(keypadValues, score);
 
   switch (config.operation) {
     case OperationType.Addition: {
-      // Enemy shows: baseNumber + ? = X, player needs to find X
-      // Display the sum, player taps the number that when added to base equals sum
-      const sum = playerValue + config.baseNumber;
+      // baseNumber + target = display
+      const displayValue = config.baseNumber + targetValue;
       return {
-        displayValue: sum,
-        targetValue: playerValue,
-        equation: `${config.baseNumber} + ? = ${sum}`,
+        displayValue,
+        targetValue,
+        equation: `${config.baseNumber} + ? = ${displayValue}`,
       };
     }
 
     case OperationType.Subtraction: {
-      // Enemy shows: X - baseNumber = ?, player finds the result
-      // Ensure no negative results
-      const minuend = playerValue + config.baseNumber;
+      // baseNumber - target = display
+      // Ensure positive result: if target >= baseNumber, limit target
+      if (targetValue >= config.baseNumber) {
+        targetValue = Math.floor(Math.random() * (config.baseNumber - 1)) + 1;
+      }
+      const displayValue = config.baseNumber - targetValue;
       return {
-        displayValue: minuend,
-        targetValue: playerValue,
-        equation: `${minuend} - ${config.baseNumber} = ?`,
+        displayValue,
+        targetValue,
+        equation: `${config.baseNumber} - ? = ${displayValue}`,
       };
     }
 
     case OperationType.Multiplication: {
-      // Enemy shows: baseNumber × ? = X, player finds the multiplier
-      const product = playerValue * config.baseNumber;
+      // baseNumber × target = display
+      const displayValue = config.baseNumber * targetValue;
       return {
-        displayValue: product,
-        targetValue: playerValue,
-        equation: `${config.baseNumber} × ? = ${product}`,
+        displayValue,
+        targetValue,
+        equation: `${config.baseNumber} × ? = ${displayValue}`,
       };
     }
 
     case OperationType.Division: {
-      // Enemy shows: X ÷ baseNumber = ?, player finds the quotient
-      // Ensure exact division: dividend = baseNumber * playerValue
-      const dividend = config.baseNumber * playerValue;
+      // dividend ÷ baseNumber = target (player finds target)
+      // Ensure exact division: dividend = baseNumber × target
+      const dividend = config.baseNumber * targetValue;
       return {
         displayValue: dividend,
-        targetValue: playerValue,
+        targetValue,
         equation: `${dividend} ÷ ${config.baseNumber} = ?`,
       };
     }
@@ -180,8 +216,16 @@ export function generateDailyEnemyValue(
  * Gets a human-readable description of today's challenge
  */
 export function getDailyChallengeDescription(config: DailyConfig): string {
-  const opNames = ['Addition', 'Subtraction', 'Multiplication', 'Division'];
-  return `${opNames[config.operation]} with ${config.baseNumber}`;
+  switch (config.operation) {
+    case OperationType.Addition:
+      return `${config.baseNumber} + (? + ? + ...) = Enemy`;
+    case OperationType.Subtraction:
+      return `${config.baseNumber} - (? + ? + ...) = Enemy`;
+    case OperationType.Multiplication:
+      return `${config.baseNumber} × (? + ? + ...) = Enemy`;
+    case OperationType.Division:
+      return `Enemy ÷ ${config.baseNumber} = (? + ? + ...)`;
+  }
 }
 
 /**
