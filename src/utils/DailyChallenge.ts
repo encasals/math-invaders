@@ -190,12 +190,16 @@ export function generateDailyEnemyValue(
     }
 
     case OperationType.Multiplication: {
-      // baseNumber × target = display
-      const displayValue = config.baseNumber * targetValue;
+      // display × baseNumber = target (player finds target)
+      // Ensure exact division: display = target / baseNumber
+      // We need targetValue to be divisible by baseNumber
+      targetValue = Math.ceil(targetValue / config.baseNumber) * config.baseNumber;
+      if (targetValue === 0) targetValue = config.baseNumber;
+      const displayValue = targetValue / config.baseNumber;
       return {
         displayValue,
         targetValue,
-        equation: `${config.baseNumber} × ? = ${displayValue}`,
+        equation: `${displayValue} × ${config.baseNumber} = ?`,
       };
     }
 
@@ -222,7 +226,7 @@ export function getDailyChallengeDescription(config: DailyConfig): string {
     case OperationType.Subtraction:
       return `${config.baseNumber} - (? + ? + ...) = Enemy`;
     case OperationType.Multiplication:
-      return `${config.baseNumber} × (? + ? + ...) = Enemy`;
+      return `Enemy x ${config.baseNumber} = (? + ? + ...)`;
     case OperationType.Division:
       return `Enemy ÷ ${config.baseNumber} = (? + ? + ...)`;
   }

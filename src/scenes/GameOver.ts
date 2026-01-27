@@ -110,7 +110,7 @@ export class GameOver extends Phaser.Scene {
     restartHitArea.on('pointerdown', () => {
       restartButton.clear();
       restartButton.fillStyle(0x00cc66, 1);
-      restartButton.fillRoundedRect(width / 2 - 90, height * 0.65, 180, 50, 12);
+      restartButton.fillRoundedRect(width / 2 - 90, height * 0.65 - 50, 180, 50, 12);
     });
 
     restartHitArea.on('pointerup', () => {
@@ -135,7 +135,7 @@ export class GameOver extends Phaser.Scene {
     menuHitArea.on('pointerdown', () => {
       menuButton.clear();
       menuButton.fillStyle(0x3366cc, 1);
-      menuButton.fillRoundedRect(width / 2 - 90, height * 0.75, 180, 50, 12);
+      menuButton.fillRoundedRect(width / 2 - 90, height * 0.75 - 50, 180, 50, 12);
     });
 
     menuHitArea.on('pointerup', () => {
@@ -160,7 +160,7 @@ export class GameOver extends Phaser.Scene {
     shareHitArea.on('pointerdown', () => {
       shareButton.clear();
       shareButton.fillStyle(0xcc9900, 1);
-      shareButton.fillRoundedRect(width / 2 - 90, height * 0.85, 180, 50, 12);
+      shareButton.fillRoundedRect(width / 2 - 90, height * 0.85 - 50, 180, 50, 12);
     });
 
     shareHitArea.on('pointerup', () => {
